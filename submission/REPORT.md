@@ -4,13 +4,13 @@
 
 ## 1. Thông tin học viên
 
-- **Họ và tên:**
-- **MSSV:**
+- **Họ và tên:** Đào Đức Hải
+- **MSSV:** 2A202602752
 - **Lớp:** K4-L3A
 - **Repository URL:**
 - **Commit SHA cuối:**
 - **Challenge ID:**
-- **Tên project Langfuse cá nhân:** `day13-k4-l3a-<MSSV>`
+- **Tên project Langfuse cá nhân:** `day13-k4-l3a-2A202602752`
 
 ## 2. Evidence index
 
@@ -37,20 +37,20 @@
 
 | Nội dung | Baseline | Kết quả cuối | Nhận xét |
 |---|---|---|---|
-| `validate_logs.py` | | | |
-| `validate_dashboard.py` | | | |
-| `pytest` | | | |
-| Số traces hợp lệ | | | |
-| Số PII leak | | | |
-| Latency P95 / TTFT P95 | | | |
-| Retrieval success rate | | | |
+| `validate_logs.py` | 30/100 | | Thiếu correlation_id và enrichment context (chưa làm CP1) |
+| `validate_dashboard.py` | 6/6 panel | | Contract schema 6/6 panel hợp lệ |
+| `pytest` | 22 passed | | Toàn bộ 22 unit tests đều pass |
+| Số traces hợp lệ | 0 | | Chưa tạo child observations (retriever/generation) |
+| Số PII leak | 0 | | Chưa phát hiện leak trong bộ sample query hiện tại |
+| Latency P95 / TTFT P95 | 3776 ms / 50 ms | | P95 cao do request khởi tạo cold-start ban đầu |
+| Retrieval success rate | 100% | | Hệ thống hoạt động bình thường, chưa inject incident |
 
 ## 4. Logging và PII
 
-- **Cách tạo/nhận và truyền correlation ID:**
-- **Các metadata được ghi vào structured log:**
-- **Cách bảo đảm PII được scrub trước khi ghi:**
-- **Cách kiểm chứng kết quả:**
+- **Cách tạo/nhận và truyền correlation ID:** Trong `CorrelationIdMiddleware`, trước mỗi request gọi `clear_contextvars()` để tránh rò rỉ context giữa các request. Kiểm tra header `x-request-id`: nếu có thì sử dụng, nếu không thì sinh mới theo mẫu `req-<8-hex>` (`req-{uuid.uuid4().hex[:8]}`). Sau đó bind vào structlog context qua `bind_contextvars(correlation_id=correlation_id)`, lưu vào `request.state.correlation_id`, đồng thời trả về client qua header `x-request-id` và `x-response-time-ms`.
+- **Các metadata được ghi vào structured log:** Gồm các trường định danh và ngữ cảnh: `correlation_id`, `user_id_hash` (hash SHA256 12 ký tự hex đầu), `session_id`, `feature`, `model`, `env`. Ở log phản hồi (`response_sent`) bổ sung thêm: `latency_ms`, `ttft_ms`, `tokens_in`, `tokens_out`, `cost_usd`, `quality_score`, `tool_name`, `tool_success`.
+- **Cách bảo đảm PII được scrub trước khi ghi:** Đăng ký processor `scrub_event` đứng trước `JsonlFileProcessor` và `JSONRenderer` trong pipeline structlog. Hàm `scrub_event` duyệt đệ quy qua các trường dữ liệu và gọi `scrub_text` để che giấu các mẫu PII (email, phone Việt Nam, CCCD 12 số, thẻ thanh toán 16 số) thành nhãn `[REDACTED_<TYPE>]` trước khi chuỗi JSON được tạo và ghi ra file `data/logs.jsonl`.
+- **Cách kiểm chứng kết quả:** Chạy `python scripts/validate_logs.py` đạt 100/100 (0 missing required, 0 missing context, 0 PII leaks, 10 unique correlation IDs). Chạy `pytest` đạt 24/24 tests pass (bao gồm các test case cho email, đa dạng format số điện thoại VN, CCCD và số thẻ tín dụng).
 
 ## 5. Tracing và prompt versioning
 
