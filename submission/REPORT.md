@@ -54,21 +54,34 @@
 
 ## 5. Tracing và prompt versioning
 
-- **Cách xác nhận traces do chính tôi tạo trong project cá nhân:**
-- **Cấu trúc root/retrieval/generation observations:**
-- **Cách nối trace với log:**
-- **Prompt name:**
-- **Version/label baseline:**
-- **Version/label candidate:**
+- **Cách xác nhận traces do chính tôi tạo trong project cá nhân:** Cấu hình API key riêng trên Langfuse Cloud (`day13-k4-l3a-2A202602752`), mỗi trace mang mã băm user id của học viên (`2055254ee30a`), tags `["lab", feature, "claude-sonnet-4-5"]`, và `environment="dev"`.
+- **Cấu trúc root/retrieval/generation observations:** Root observation `lab-agent-run` (type `AGENT`) bao bọc toàn bộ request. Phía trong gồm 2 child observations: `retrieval` (type `RETRIEVER`) đo thời gian tra cứu vector/mock RAG, và `llm-generate` (type `GENERATION`) đo thời gian sinh câu trả lời của mô hình, ghi nhận model, prompt version, input/output tokens và chi phí USD.
+- **Cách nối trace với log:** Thông qua `correlation_id` (ví dụ `req-7054d41e`). Middleware tạo và bind correlation ID vào contextvars log, đồng thời chuyển vào metadata của Langfuse trace (`metadata={"correlation_id": correlation_id}`). Nhờ đó có thể từ một dòng log bất kỳ nhảy sang trace tương ứng trên Langfuse để xem span waterfall.
+- **Prompt name:** `day13-chat`
+- **Version/label baseline:** Version `1`, mang labels `baseline` và `production`.
+- **Version/label candidate:** Version `2`, mang label `candidate` (chỉnh sửa template thêm yêu cầu trả lời ngắn gọn theo gạch đầu dòng).
 - **Trace ID của mỗi version:**
+  - Version 1 (baseline/production): Trace ID `7293ca0d6e5ca95add13ff71392b26ff` (correlation ID: `req-7054d41e`).
+  - Version 2 (candidate): Trace ID `380cb6620569c2a8dd38e345db9ca260` (correlation ID: `req-f0ab17c6`).
 - **Cách promote và rollback `production`:**
+  - Promote: Dùng Langfuse SDK hoặc giao diện UI chuyển label `production` sang Version 2 (`client.update_prompt(name='day13-chat', version=2, new_labels=['candidate', 'production'])`).
+  - Rollback: Khi cần hoàn nguyên về Version 1, cập nhật lại label `production` cho Version 1 (`client.update_prompt(name='day13-chat', version=1, new_labels=['baseline', 'production'])`). Hệ thống tự động fetch prompt theo label `production` nên lập tức quay về phiên bản cũ mà không cần restart hay sửa code.
 
 ## 6. Dashboard, SLO và alerts
 
-- **Dashboard và sáu panel:**
-- **SLO và lý do chọn:**
-- **Cách tính error budget:**
+- **Dashboard và sáu panel:** Dựng đúng contract `config/dashboard.yaml` lấy nguồn từ `data/logs.jsonl`:
+  1. `latency`: P50, P95, P99 và TTFT P95 (ngưỡng P95 <= 3000ms).
+  2. `traffic`: Số lượng request và request rate theo phút (ngưỡng >= 1 req/min).
+  3. `errors`: Error rate %, breakdown theo error_type và retrieval success rate % (ngưỡng error <= 2%).
+  4. `cost`: Chi phí USD theo phút và tổng lũy kế (ngưỡng <= $2.5).
+  5. `tokens`: Tổng tokens_in và tokens_out (ngưỡng <= 50,000 tokens).
+  6. `quality`: Điểm chất lượng trung bình của câu trả lời proxy (ngưỡng mean >= 0.75).
+- **SLO và lý do chọn:** Primary SLO là `fast_successful_requests` với target 99.5% trong cửa sổ 28 ngày (`latency_ms <= 3000` và `response_sent`). Lý do: Đáp ứng tương tác người dùng thời gian thực, đảm bảo dịch vụ phản hồi ổn định và không làm người dùng chờ đợi quá 3 giây.
+- **Cách tính error budget:** Error budget = 100% - 99.5% = 0.5% tổng số request trong cửa sổ 28 ngày. Với 100,000 requests, ngân sách lỗi cho phép là 500 requests thất bại hoặc vượt quá 3000ms.
 - **Ba alert và runbook tương ứng:**
+  1. `HighLatencyP95`: P95 > 2500ms trong 3 phút (warning, Slack #alerts-latency, Runbook: `docs/alerts.md#alert-1`).
+  2. `HighErrorRate`: Error rate > 2% trong 2 phút (critical, Slack #alerts-critical, Runbook: `docs/alerts.md#alert-2`).
+  3. `CostSpikeAnomaly`: Chi phí > $0.05/phút trong 5 phút (warning, Slack #alerts-finops, Runbook: `docs/alerts.md#alert-3`).
 
 ## 7. Điều tra challenge
 
