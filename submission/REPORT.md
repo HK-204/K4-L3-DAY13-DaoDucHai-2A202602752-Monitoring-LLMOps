@@ -7,8 +7,8 @@
 - **Họ và tên:** Đào Đức Hải
 - **MSSV:** 2A202602752
 - **Lớp:** K4-L3A
-- **Repository URL:** https://github.com/HK-204/K4-L3A-DAY13-DaoDucHai-2A202602752-Monitoring-LLMOps
-- **Commit SHA cuối:** `6cc9a3b11fde2bf8eee360ff145a046299f6e3b8` (hoàn tất CP4 evidence & report)
+- **Repository URL:** https://github.com/HK-204/K4-L3-DAY13-DaoDucHai-2A202602752-Monitoring-LLMOps
+- **Commit SHA cuối:** 2af4ddc6c5b949cd9ffe0e74df9d52fe592ef4d2
 - **Challenge ID:** practice-rag_slow
 - **Tên project Langfuse cá nhân:** `day13-k4-l3a-2A202602752`
 
@@ -23,15 +23,15 @@
 | Dashboard validator | `evidence/03-dashboard-validator.txt` |
 | Structured log | `evidence/04-structured-log.txt` |
 | PII redaction | `evidence/05-pii-redaction.txt` |
-| Trace list | `evidence/06-trace-list.png` |
-| Trace waterfall | `evidence/07-trace-waterfall.png` |
-| Trace metadata | `evidence/08-trace-metadata.png` |
-| Prompt versions | `evidence/09-prompt-versions.png` |
+| Trace list | `evidence/06-trace-list.png` (kèm `evidence/06-trace-list.txt`) |
+| Trace waterfall | `evidence/07-trace-waterfall.png` (kèm `evidence/07-trace-waterfall.txt`) |
+| Trace metadata | `evidence/08-trace-metadata.png` (kèm `evidence/08-trace-metadata.txt`) |
+| Prompt versions | `evidence/09-prompt-versions.png` (kèm `evidence/09-prompt-versions.txt`) |
 | Prompt rollback | `evidence/10-prompt-rollback.txt` |
-| Dashboard runtime | `evidence/11-dashboard-overview.txt` |
+| Dashboard runtime | `evidence/11-dashboard-overview.txt` (kèm `evidence/dashboard.html`) |
 | Incident metric | `evidence/12-incident-metric.txt` |
 | Incident log | `evidence/13-incident-log.txt` |
-| Incident trace | `evidence/14-incident-trace.png` |
+| Incident trace | `evidence/14-incident-trace.png` (kèm `evidence/14-incident-trace.txt`) |
 
 ## 3. Kết quả kỹ thuật
 
