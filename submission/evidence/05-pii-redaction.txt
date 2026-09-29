@@ -1,0 +1,18 @@
+PII Scrubbing Verification:
+
+1. Test Inputs with PII (from data/sample_queries.jsonl):
+- Email: "What is your refund policy? My email is student@vinuni.edu.vn"
+- Phone: "Here is my phone 0987654321, what should be logged?"
+- Credit Card: "What is the policy for PII and credit card 4111 1111 1111 1111?"
+- Citizen ID (CCCD): "So CCCD cua toi la 001234567890"
+
+2. Scrubbed Outputs in data/logs.jsonl:
+- "What is your refund policy? My email is [REDACTED_EMAIL]"
+- "Here is my phone [REDACTED_PHONE_VN], what should be logged?"
+- "What is the policy for PII and credit card [REDACTED_CREDIT_CARD]?"
+- "So CCCD cua toi la [REDACTED_CCCD]"
+
+3. PII Leak Detection Result:
+- Total records analyzed: 73
+- Potential PII leaks detected: 0
+- Status: + [PASSED] PII scrubbing

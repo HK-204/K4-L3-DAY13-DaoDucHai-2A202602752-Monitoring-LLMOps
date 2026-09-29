@@ -7,7 +7,7 @@
 - **Họ và tên:** Đào Đức Hải
 - **MSSV:** 2A202602752
 - **Lớp:** K4-L3A
-- **Repository URL:**
+- **Repository URL:** https://github.com/HK-204/K4-L3A-DAY13-DaoDucHai-2A202602752-Monitoring-LLMOps
 - **Commit SHA cuối:**
 - **Challenge ID:** practice-rag_slow
 - **Tên project Langfuse cá nhân:** `day13-k4-l3a-2A202602752`
@@ -18,19 +18,19 @@
 
 | Evidence | Đường dẫn |
 |---|---|
-| Pytest cuối | `evidence/01-pytest.png` |
-| Log validator | `evidence/02-log-validator.png` |
-| Dashboard validator | `evidence/03-dashboard-validator.png` |
-| Structured log | `evidence/04-structured-log.png` |
-| PII redaction | `evidence/05-pii-redaction.png` |
+| Pytest cuối | `evidence/01-pytest.txt` |
+| Log validator | `evidence/02-log-validator.txt` |
+| Dashboard validator | `evidence/03-dashboard-validator.txt` |
+| Structured log | `evidence/04-structured-log.txt` |
+| PII redaction | `evidence/05-pii-redaction.txt` |
 | Trace list | `evidence/06-trace-list.png` |
 | Trace waterfall | `evidence/07-trace-waterfall.png` |
 | Trace metadata | `evidence/08-trace-metadata.png` |
 | Prompt versions | `evidence/09-prompt-versions.png` |
-| Prompt rollback | `evidence/10-prompt-rollback.png` |
-| Dashboard runtime | `evidence/11-dashboard-overview.png` |
-| Incident metric | `evidence/12-incident-metric.png` |
-| Incident log | `evidence/13-incident-log.png` |
+| Prompt rollback | `evidence/10-prompt-rollback.txt` |
+| Dashboard runtime | `evidence/11-dashboard-overview.txt` |
+| Incident metric | `evidence/12-incident-metric.txt` |
+| Incident log | `evidence/13-incident-log.txt` |
 | Incident trace | `evidence/14-incident-trace.png` |
 
 ## 3. Kết quả kỹ thuật
@@ -66,6 +66,20 @@
 - **Cách promote và rollback `production`:**
   - Promote: Dùng Langfuse SDK hoặc giao diện UI chuyển label `production` sang Version 2 (`client.update_prompt(name='day13-chat', version=2, new_labels=['candidate', 'production'])`).
   - Rollback: Khi cần hoàn nguyên về Version 1, cập nhật lại label `production` cho Version 1 (`client.update_prompt(name='day13-chat', version=1, new_labels=['baseline', 'production'])`). Hệ thống tự động fetch prompt theo label `production` nên lập tức quay về phiên bản cũ mà không cần restart hay sửa code.
+
+### Minh chứng Tracing & Prompt Management (Langfuse UI)
+
+![Trace list](evidence/06-trace-list.png)
+*Hình 1: Danh sách traces trên Langfuse cá nhân day13-k4-l3a-2A202602752*
+
+![Trace waterfall](evidence/07-trace-waterfall.png)
+*Hình 2: Cấu trúc quan hệ cha-con: Root agent -> retrieval -> llm-generate*
+
+![Trace metadata](evidence/08-trace-metadata.png)
+*Hình 3: Chi tiết metadata, correlation_id, token, latency và cost*
+
+![Prompt versions](evidence/09-prompt-versions.png)
+*Hình 4: Quản lý phiên bản prompt day13-chat (v1: baseline/production, v2: candidate)*
 
 ## 6. Dashboard, SLO và alerts
 
@@ -104,6 +118,11 @@
   - Triển khai Semantic Caching cho các câu hỏi tra cứu phổ biến nhằm giảm tải trực tiếp cho Vector DB.
   - Sử dụng Alert `HighLatencyP95` đã cấu hình để phát hiện và cảnh báo sớm về kênh Slack trong vòng 3 phút khi triệu chứng bắt đầu xuất hiện.
 
+### Minh chứng Incident Trace (Langfuse UI)
+
+![Incident trace](evidence/14-incident-trace.png)
+*Hình 5: Trace của sự cố practice-rag_slow chứng minh span retrieval gây nghẽn 2.501s*
+
 ## 8. Giải thích và tự đánh giá
 
 - **Một quyết định kỹ thuật quan trọng và lý do:** Đặt `scrub_event` processor đứng trước `JsonlFileProcessor` và `JSONRenderer` trong pipeline structlog. Lý do: Bảo đảm thông tin cá nhân (PII) được khử hoàn toàn ngay trong bộ nhớ trước khi dữ liệu được ghi xuống file log trên đĩa hay gửi ra ngoài qua network.
@@ -119,10 +138,10 @@
 
 ## 9. Checklist trước khi nộp
 
-- [ ] Kết quả và evidence thuộc commit SHA cuối.
-- [ ] Tất cả ảnh/output mở được bằng đường dẫn tương đối.
-- [ ] Incident evidence nối đúng metric → log → trace.
-- [ ] Trace/prompt evidence thuộc project Langfuse cá nhân và ảnh không lộ key/secret.
-- [ ] Repository chạy lại được theo README.
-- [ ] Không có secret, API key, PII thô hoặc evidence của người khác/lớp khác.
+- [x] Kết quả và evidence thuộc commit SHA cuối.
+- [x] Tất cả ảnh/output mở được bằng đường dẫn tương đối.
+- [x] Incident evidence nối đúng metric → log → trace.
+- [x] Trace/prompt evidence thuộc project Langfuse cá nhân và ảnh không lộ key/secret.
+- [x] Repository chạy lại được theo README.
+- [x] Không có secret, API key, PII thô hoặc evidence của người khác/lớp khác.
 - [ ] URL repo và commit SHA cuối đã được nộp trên LMS/Codelabs.

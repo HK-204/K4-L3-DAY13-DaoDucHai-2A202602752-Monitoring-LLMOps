@@ -1,0 +1,20 @@
+Langfuse Cloud Traces List
+Project: day13-k4-l3a-2A202602752
+Total Traces Recorded: 25+
+
+Sample Trace IDs created by user:
+1.  7293ca0d6e5ca95add13ff71392b26ff | Name: day13-agent-request | Prompt v1 (baseline/production)
+2.  380cb6620569c2a8dd38e345db9ca260 | Name: day13-agent-request | Prompt v2 (candidate)
+3.  4195abd30d6346ca44f06384f2e38602 | Name: day13-agent-request | Incident trace (rag_slow)
+4.  f91e41abeb51069c003dce434324b3f5 | Name: day13-agent-request | Incident trace (rag_slow)
+5.  45b23d83af6679bd62be37a520f67837 | Name: day13-agent-request | Workload trace
+6.  fe31c31d1d3df2e84bfe0372a62e3da0 | Name: day13-agent-request | Workload trace
+7.  e96a0f5f00dc91d207b6cf37c3a24f59 | Name: day13-agent-request | Workload trace
+8.  872d04ce172b2b176e515125f85f84ba | Name: day13-agent-request | Workload trace
+9.  c99af56585c32162d4ba3640b01fdcf1 | Name: day13-agent-request | Workload trace
+10. 95adf9a03a080110dba613a62b30877f | Name: day13-agent-request | Workload trace
+11. 08f9da23fdcfb3867eea73997f90cfb5 | Name: day13-agent-request | Workload trace
+12. 38f9fb3b1837070ef3201c3af44ed4d6 | Name: day13-agent-request | Workload trace
+13. e8925ad06dc79c5b0f6f4634b87975a7 | Name: day13-agent-request | Workload trace
+14. 89edc88d32d873a3142888ab84b5a971 | Name: day13-agent-request | Workload trace
+15. e79f8c9e57df520cc78ad9b69cc85259 | Name: day13-agent-request | Workload trace

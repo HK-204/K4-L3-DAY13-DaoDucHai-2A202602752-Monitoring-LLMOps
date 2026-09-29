@@ -1,0 +1,24 @@
+Incident Metric Snapshot
+Scenario: practice-rag_slow
+Time Window: 2026-09-29 09:37:00 UTC - 09:40:00 UTC (16:37 - 16:40 local)
+
+API /metrics snapshot during incident:
+{
+  "traffic": 21,
+  "latency_p50": 2651.0,
+  "latency_p95": 2653.0,
+  "latency_p99": 12272.0,
+  "ttft_p95": 50.0,
+  "avg_cost_usd": 0.0021,
+  "total_cost_usd": 0.0449,
+  "tokens_in_total": 893,
+  "tokens_out_total": 2816,
+  "error_breakdown": {},
+  "quality_avg": 0.8762
+}
+
+Observations:
+- latency_p95 breached the 2500ms warning threshold (2653.0 ms)
+- latency_p99 spiked to 12272.0 ms
+- ttft_p95 remained normal at 50.0 ms
+- error_breakdown remained empty (no 5xx HTTP exceptions)

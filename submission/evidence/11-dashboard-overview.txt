@@ -1,0 +1,38 @@
+Dashboard Runtime Overview
+Source: data/logs.jsonl (73 records)
+Contract: config/dashboard.yaml (6/6 panels valid)
+Time Window: 60 minutes
+
+Panel Breakdown:
+1. Latency & TTFT:
+   - P50: 156.0 ms
+   - P95: 157.0 ms
+   - P99: 2652.0 ms
+   - TTFT P95: 50.0 ms
+   - Threshold: P95 <= 3000ms [PASSED]
+
+2. Request Traffic:
+   - Total Requests: 35
+   - Rate: ~5.0 requests/minute
+   - Threshold: >= 1 req/min [PASSED]
+
+3. Errors & Retrieval Success:
+   - HTTP Error Rate: 0.0%
+   - Retrieval Success Rate: 100.0%
+   - Error Breakdown: None (0 crashes)
+   - Threshold: Error Rate <= 2.0% [PASSED]
+
+4. Cost:
+   - Average Request Cost: $0.0021 USD
+   - Total Window Cost: $0.0449 USD
+   - Threshold: Total <= $2.5 USD [PASSED]
+
+5. Tokens Usage:
+   - Tokens In Total: 893 tokens
+   - Tokens Out Total: 2816 tokens
+   - Total Tokens: 3709 tokens
+   - Threshold: Total <= 50,000 tokens [PASSED]
+
+6. Quality Proxy:
+   - Quality Average: 0.88 / 1.0
+   - Threshold: Mean >= 0.75 [PASSED]

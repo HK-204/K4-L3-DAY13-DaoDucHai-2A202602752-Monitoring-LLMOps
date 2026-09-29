@@ -1,0 +1,22 @@
+Langfuse Prompt Versions
+Prompt Name: day13-chat
+Project: day13-k4-l3a-2A202602752
+
+1. Version 1:
+   - Type: text
+   - Labels: ['baseline', 'production']
+   - Commit Message: Initial baseline prompt v1
+   - Template Content:
+     Feature={{feature}}
+     Docs={{docs}}
+     Question={{message}}
+
+2. Version 2:
+   - Type: text
+   - Labels: ['candidate', 'latest']
+   - Commit Message: Candidate prompt v2 with concise bullet points
+   - Template Content:
+     Feature={{feature}}
+     Docs={{docs}}
+     Question={{message}}
+     Answer concisely in bullet points.

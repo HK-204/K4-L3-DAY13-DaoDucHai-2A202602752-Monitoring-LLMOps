@@ -1,0 +1,31 @@
+Trace and Observation Metadata
+Trace ID: 7293ca0d6e5ca95add13ff71392b26ff
+Project: day13-k4-l3a-2A202602752
+
+Trace Attributes & Metadata:
+- trace_name: day13-agent-request
+- environment: dev
+- user_id_hash: 2055254ee30a
+- session_id: s01
+- feature: qa
+- model: claude-sonnet-4-5
+- correlation_id: req-7054d41e
+- tags: ["lab", "qa", "claude-sonnet-4-5"]
+
+Observation (Root - lab-agent-run) Metadata:
+- doc_count: 1
+- query_preview: "Explain why metrics traces and logs work together"
+- prompt_name: "day13-chat"
+- prompt_label: "production"
+- prompt_version: "1"
+- prompt_source: "langfuse"
+- prompt_fetch_error: ""
+
+Generation (llm-generate) Metadata & Usage:
+- model: claude-sonnet-4-5
+- prompt_name: day13-chat (version 1)
+- tokens_in: 32
+- tokens_out: 124
+- total_tokens: 156
+- cost_usd: 0.001956
+- raw PII contained: NONE

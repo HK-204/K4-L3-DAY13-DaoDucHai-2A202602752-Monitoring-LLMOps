@@ -1,0 +1,22 @@
+Langfuse Prompt Promotion and Rollback Verification
+Prompt Name: day13-chat
+Project: day13-k4-l3a-2A202602752
+
+Step 1 - Baseline State:
+- Version 1 had labels ['baseline', 'production']
+- Executed Trace ID: 7293ca0d6e5ca95add13ff71392b26ff (used version 1)
+
+Step 2 - Candidate State:
+- Version 2 created with label ['candidate']
+- Executed Trace ID: 380cb6620569c2a8dd38e345db9ca260 (used version 2)
+
+Step 3 - Promote Candidate to Production:
+- Promoted Version 2 to label 'production':
+  Command: client.update_prompt(name='day13-chat', version=2, new_labels=['candidate', 'production'])
+  Result: Version 2 active labels: ['candidate', 'production', 'latest']
+
+Step 4 - Rollback Production to Baseline:
+- Rolled back label 'production' to Version 1:
+  Command: client.update_prompt(name='day13-chat', version=1, new_labels=['baseline', 'production'])
+  Result: Version 1 active labels: ['baseline', 'production']
+  Active production prompt version after rollback: 1

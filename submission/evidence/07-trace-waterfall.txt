@@ -1,0 +1,9 @@
+Trace Waterfall Structure
+Trace ID: 7293ca0d6e5ca95add13ff71392b26ff
+Project: day13-k4-l3a-2A202602752
+Name: day13-agent-request
+
+Hierarchy:
+└── [AGENT] lab-agent-run (Observation ID: 1567db188c76edc1, Duration: ~1.76s, Version: 1)
+    ├── [RETRIEVER] retrieval (Observation ID: f20d0ed85a9d4151, Duration: ~0.001s, Docs count: 1)
+    └── [GENERATION] llm-generate (Observation ID: 4e0e99704039d452, Duration: ~0.150s, Model: claude-sonnet-4-5)

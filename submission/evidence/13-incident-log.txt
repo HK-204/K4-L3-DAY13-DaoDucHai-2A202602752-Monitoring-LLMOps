@@ -1,0 +1,12 @@
+Incident Log Line
+Scenario: practice-rag_slow
+Correlation ID: req-002b3ffb
+
+Log Lines from data/logs.jsonl:
+{"service": "api", "payload": {"message_preview": "What is your refund policy? My email is [REDACTED_EMAIL]"}, "event": "request_received", "model": "claude-sonnet-4-5", "session_id": "s01", "user_id_hash": "2055254ee30a", "env": "dev", "feature": "qa", "correlation_id": "req-002b3ffb", "level": "info", "ts": "2026-09-29T09:37:11.159093Z"}
+{"service": "api", "latency_ms": 2652, "ttft_ms": 50, "tokens_in": 45, "tokens_out": 115, "cost_usd": 0.00186, "quality_score": 0.9, "tool_name": "retrieval", "tool_success": true, "payload": {"answer_preview": "Starter answer. You should improve this output logic and add better quality chec..."}, "event": "response_sent", "model": "claude-sonnet-4-5", "session_id": "s01", "user_id_hash": "2055254ee30a", "env": "dev", "feature": "qa", "correlation_id": "req-002b3ffb", "level": "info", "ts": "2026-09-29T09:37:13.812891Z"}
+
+Summary:
+- Request ID: req-002b3ffb
+- Processing Latency: 2652 ms
+- PII Scrubbing: [REDACTED_EMAIL] verified
