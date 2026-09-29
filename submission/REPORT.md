@@ -9,7 +9,7 @@
 - **Lớp:** K4-L3A
 - **Repository URL:**
 - **Commit SHA cuối:**
-- **Challenge ID:**
+- **Challenge ID:** practice-rag_slow
 - **Tên project Langfuse cá nhân:** `day13-k4-l3a-2A202602752`
 
 ## 2. Evidence index
@@ -37,13 +37,13 @@
 
 | Nội dung | Baseline | Kết quả cuối | Nhận xét |
 |---|---|---|---|
-| `validate_logs.py` | 30/100 | | Thiếu correlation_id và enrichment context (chưa làm CP1) |
-| `validate_dashboard.py` | 6/6 panel | | Contract schema 6/6 panel hợp lệ |
-| `pytest` | 22 passed | | Toàn bộ 22 unit tests đều pass |
-| Số traces hợp lệ | 0 | | Chưa tạo child observations (retriever/generation) |
-| Số PII leak | 0 | | Chưa phát hiện leak trong bộ sample query hiện tại |
-| Latency P95 / TTFT P95 | 3776 ms / 50 ms | | P95 cao do request khởi tạo cold-start ban đầu |
-| Retrieval success rate | 100% | | Hệ thống hoạt động bình thường, chưa inject incident |
+| `validate_logs.py` | 30/100 | 100/100 | Đạt chuẩn schema, đủ correlation ID, enrichment context, scrub sạch PII |
+| `validate_dashboard.py` | 6/6 panel | 6/6 panel | Contract schema 6/6 panel đầy đủ và hợp lệ |
+| `pytest` | 22 passed | 24 passed | Toàn bộ unit tests đều pass (bổ sung test CCCD, credit card) |
+| Số traces hợp lệ | 0 | 25+ traces | Đầy đủ span tree: root (agent), retrieval (retriever), llm-generate (generation) |
+| Số PII leak | 0 | 0 leak | Không phát hiện rò rỉ dữ liệu nhạy cảm trong log và trace |
+| Latency P95 / TTFT P95 | 3776 ms / 50 ms | 157 ms / 50 ms (bình thường), 2653 ms (incident) | Phản ánh chính xác triệu chứng sự cố và khôi phục tốt |
+| Retrieval success rate | 100% | 100% | Hệ thống tra cứu tài liệu ổn định |
 
 ## 4. Logging và PII
 
@@ -85,24 +85,37 @@
 
 ## 7. Điều tra challenge
 
-- **Challenge ID:**
-- **Khoảng thời gian điều tra:**
-- **Triệu chứng từ metrics:**
+- **Challenge ID:** `practice-rag_slow` (Thực hiện điều tra practice scenario theo đúng quy trình chuẩn của `docs/DASHBOARD_SETUP.md` và `README.md`).
+- **Khoảng thời gian điều tra:** `2026-09-29 09:37:00 UTC` - `2026-09-29 09:40:00 UTC` (16:37 - 16:40 giờ Việt Nam).
+- **Triệu chứng từ metrics:** Độ trễ tăng đột biến diện rộng: `latency_p50 = 2651.0 ms`, `latency_p95 = 2653.0 ms`, `latency_p99 = 12272.0 ms` (vi phạm ngưỡng SLO 3000ms và Alert 2500ms), trong khi `ttft_p95` vẫn giữ nguyên ở mức 50ms và không có lỗi crash HTTP 5xx.
 - **Log line và correlation ID liên quan:**
+  - `correlation_id`: `req-002b3ffb`
+  - Log `request_received`: `{"service": "api", "payload": {"message_preview": "What is your refund policy? My email is [REDACTED_EMAIL]"}, "event": "request_received", "correlation_id": "req-002b3ffb", "ts": "2026-09-29T09:37:11.159093Z"}`
+  - Log `response_sent`: `{"service": "api", "latency_ms": 2652, "ttft_ms": 50, "tokens_in": 45, "tokens_out": 115, "cost_usd": 0.00186, "quality_score": 0.9, "tool_name": "retrieval", "tool_success": true, "correlation_id": "req-002b3ffb", "event": "response_sent", "ts": "2026-09-29T09:37:13.812891Z"}`
 - **Trace ID và span gây ảnh hưởng:**
-- **Root cause:**
+  - Trace ID: `4195abd30d6346ca44f06384f2e38602`
+  - Span gây ảnh hưởng: `retrieval` (type `RETRIEVER`) mất **2.501 giây** trên tổng số **2.652 giây** của toàn bộ request (chiếm ~94.3% độ trễ). Trong khi đó span `llm-generate` (type `GENERATION`) chỉ mất **0.150 giây** (150ms).
+- **Root cause:** Tầng tra cứu vector store / RAG backend (`mock_rag.retrieve`) bị nghẽn làm phát sinh thêm 2.5s độ trễ cho mỗi truy vấn, không phải do mô hình LLM sinh từ chậm.
 - **Fix action:**
+  - Tắt kịch bản incident thông qua endpoint `/incidents/rag_slow/disable`.
+  - Kiểm tra hiệu năng và tối ưu chỉ mục (indexing) của Vector Database, scale thêm read replica cho cụm search service.
 - **Preventive measure:**
+  - Thiết lập timeout cho bước retrieval (ví dụ 1.5s). Nếu quá thời gian, tự động fallback trả lời ngữ cảnh cơ bản để không chặn request của người dùng.
+  - Triển khai Semantic Caching cho các câu hỏi tra cứu phổ biến nhằm giảm tải trực tiếp cho Vector DB.
+  - Sử dụng Alert `HighLatencyP95` đã cấu hình để phát hiện và cảnh báo sớm về kênh Slack trong vòng 3 phút khi triệu chứng bắt đầu xuất hiện.
 
 ## 8. Giải thích và tự đánh giá
 
-- **Một quyết định kỹ thuật quan trọng và lý do:**
-- **Một lỗi/blocker đã gặp:**
-- **Cách tìm nguyên nhân và xử lý:**
+- **Một quyết định kỹ thuật quan trọng và lý do:** Đặt `scrub_event` processor đứng trước `JsonlFileProcessor` và `JSONRenderer` trong pipeline structlog. Lý do: Bảo đảm thông tin cá nhân (PII) được khử hoàn toàn ngay trong bộ nhớ trước khi dữ liệu được ghi xuống file log trên đĩa hay gửi ra ngoài qua network.
+- **Một lỗi/blocker đã gặp:** Khi kiểm tra prompt version ban đầu, app trả về `local-v1` thay vì `version 1` từ Langfuse Cloud.
+- **Cách tìm nguyên nhân và xử lý:** Qua điều tra trace metadata thấy `prompt_source=local-fallback` do prompt `day13-chat` chưa tồn tại trên project Langfuse cá nhân khi server khởi động. Sau khi tạo prompt `day13-chat` trên Langfuse và restart uvicorn server, app đã fetch thành công prompt từ Langfuse với `version=1` và `prompt_source=langfuse`.
 - **Cách hiểu luồng Metrics → Logs → Traces:**
-- **Vai trò của prompt version, token/cost, SLO hoặc rollback trong vận hành LLM:**
-- **Điều quan trọng nhất đã học:**
-- **Hạn chế hoặc phần chưa hoàn thành, nếu có:**
+  - **Metrics:** Cho biết *hệ thống có chuyện gì và khi nào* (triệu chứng diện rộng: P95 tăng vọt lên ~2.6s).
+  - **Logs:** Giúp xác định *request cụ thể nào bị ảnh hưởng* thông qua việc lọc dòng log chậm và lấy `correlation_id` (ví dụ `req-002b3ffb`).
+  - **Traces:** Giúp chỉ ra *bước nào là nguyên nhân gốc rễ* bằng cách mở biểu đồ thác nước (waterfall), thấy ngay span `retrieval` tốn 2.501s trong khi `llm-generate` chỉ tốn 0.150s.
+- **Vai trò của prompt version, token/cost, SLO hoặc rollback trong vận hành LLM:** LLM là hệ thống tốn kém tài nguyên và phi tất định. Prompt versioning cho phép quản trị phiên bản và rollback tức thì khi prompt mới gây suy giảm chất lượng hoặc tiêu tốn token. Giám sát token/cost và SLO giúp bảo vệ ngân sách dự án và cam kết chất lượng phản hồi đối với người dùng.
+- **Điều quan trọng nhất đã học:** Nắm vững quy trình Observability thực chiến cho hệ thống LLM: Biến một AI API từ "hộp đen" thành hệ thống có thể giải trình minh bạch mọi request thông qua Metrics → Logs → Traces.
+- **Hạn chế hoặc phần chưa hoàn thành, nếu có:** Chưa có file release `config/challenge.json` riêng của lớp từ Lab Coach nên đã thực hành hoàn chỉnh quy trình trên kịch bản `rag_slow` chuẩn theo tài liệu hướng dẫn. Sẵn sàng nạp file challenge chính thức bất cứ khi nào Lab Coach cung cấp.
 
 ## 9. Checklist trước khi nộp
 
