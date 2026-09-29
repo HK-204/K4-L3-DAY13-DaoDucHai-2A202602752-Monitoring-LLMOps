@@ -8,7 +8,7 @@
 - **MSSV:** 2A202602752
 - **Lớp:** K4-L3A
 - **Repository URL:** https://github.com/HK-204/K4-L3A-DAY13-DaoDucHai-2A202602752-Monitoring-LLMOps
-- **Commit SHA cuối:**
+- **Commit SHA cuối:** `6cc9a3b11fde2bf8eee360ff145a046299f6e3b8` (hoàn tất CP4 evidence & report)
 - **Challenge ID:** practice-rag_slow
 - **Tên project Langfuse cá nhân:** `day13-k4-l3a-2A202602752`
 
